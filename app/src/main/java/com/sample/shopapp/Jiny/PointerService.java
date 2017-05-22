@@ -73,7 +73,7 @@ public class PointerService extends Service {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-//                soundPlayer.play(getApplicationContext(), event.getSoundResId());
+                soundPlayer.play(getApplicationContext(), event.getSoundResId());
             }
         }, 500);
     }
@@ -87,7 +87,7 @@ public class PointerService extends Service {
         if(event.isHideJinyIcon()){
             jinyIcon.hide();
         }
-//        soundPlayer.stop();
+        soundPlayer.stop();
    }
 
     @Subscribe

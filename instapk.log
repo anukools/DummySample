@@ -1,7 +1,7 @@
 May 22, 2017 9:45:15 AM com.pytenlabs.instapk.helpers.LogHelper init
 INFO: Windows 8.1, 6.3, amd64, Android Studio AI-162.2228.14
 May 22, 2017 9:45:19 AM com.pytenlabs.instapk.helpers.ProjectInfoHelper getProjectDetails
-INFO: ProjectInfo{versionCode=1, versionName='1.0', packageName='com.vinsol.spree', projectName='spree-android'}
+INFO: ProjectInfo{versionCode=1, versionName='1.0', packageName='com.sample.shopapp', projectName='spree-android'}
 May 22, 2017 10:30:38 AM com.pytenlabs.instapk.helpers.ProjectInfoHelper getProjectDetails
 INFO: ProjectInfo{versionCode=1, versionName='1.0', packageName='com.hitesh_sahu.retailapp', projectName='ECommerce-App-Android'}
 May 22, 2017 11:33:40 AM com.pytenlabs.instapk.helpers.ProjectInfoHelper getProjectDetails

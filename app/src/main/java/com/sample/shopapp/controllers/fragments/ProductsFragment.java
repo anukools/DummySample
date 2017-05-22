@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -475,8 +476,16 @@ public class ProductsFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
 
-        if (rootView != null)
-            UIViewsHandler.handleProductListPageView(getActivity(), rootView);
+        // Layout has happened here.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (rootView != null)
+                    UIViewsHandler.handleProductListPageView(getActivity(), rootView);
+            }
+        }, 500);
+
     }
 
     @Override

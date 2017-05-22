@@ -54,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/home_tab_layout"
-            app:layout_behavior="com.vinsol.spree.viewhelpers.CustomScrollingViewBehavior"
+            app:layout_behavior="com.sample.shopapp.viewhelpers.CustomScrollingViewBehavior"
             >
         </android.support.v4.view.ViewPager>
     </android.support.design.widget.CoordinatorLayout>

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectStorageHelper">
     <option name="apkLocation" value="E:\software\test\spree-android\app\build\outputs\apk\app-debug.apk" />
-    <option name="packageName" value="com.vinsol.spree" />
+    <option name="packageName" value="com.sample.shopapp" />
     <option name="projectName" value="dummy shop" />
   </component>
 </project>
