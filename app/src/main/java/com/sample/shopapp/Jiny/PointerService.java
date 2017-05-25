@@ -3,6 +3,8 @@ package com.sample.shopapp.Jiny;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
+import android.media.AudioManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -29,6 +31,8 @@ public class PointerService extends Service {
 
     private SoundPlayer soundPlayer;
 
+    SettingsContentObserver mSettingsContentObserver;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -46,6 +50,12 @@ public class PointerService extends Service {
             soundPlayer = new SoundPlayer();
 
             PointerService.bus.register(this);
+
+
+            mSettingsContentObserver = new SettingsContentObserver(new Handler());
+            context.getContentResolver().registerContentObserver(
+                    android.provider.Settings.System.CONTENT_URI, true,
+                    mSettingsContentObserver);
 
             Log.e("Pointer : ", "startUIService registered");
         } catch (Exception e) {
@@ -65,7 +75,6 @@ public class PointerService extends Service {
 
     @Subscribe
     public void showPointerUIEvent(final BusEvents.ShowUIEvent event) {
-        Log.e("Pointer : ", "showPointerUIEvent");
         pointerIcon.show(event.getX(), event.getY(), event.getGravity());
         jinyIcon.show();
 
@@ -73,7 +82,7 @@ public class PointerService extends Service {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                soundPlayer.play(getApplicationContext(), event.getSoundResId());
+//                soundPlayer.play(getApplicationContext(), event.getSoundResId());
             }
         }, 500);
     }
@@ -84,11 +93,11 @@ public class PointerService extends Service {
             pointerIcon.hide();
         }
 
-        if(event.isHideJinyIcon()){
+        if (event.isHideJinyIcon()) {
             jinyIcon.hide();
         }
-        soundPlayer.stop();
-   }
+//        soundPlayer.stop();
+    }
 
     @Subscribe
     public void animatePointerUIEvent(BusEvents.AnimateEvent event) {
@@ -125,6 +134,40 @@ public class PointerService extends Service {
 
         PointerService.bus.unregister(this);
 
+        if (mSettingsContentObserver != null)
+            this.getApplicationContext().getContentResolver().unregisterContentObserver(mSettingsContentObserver);
+    }
 
+    public class SettingsContentObserver extends ContentObserver {
+        private AudioManager audioManager;
+
+        public SettingsContentObserver(Handler handler) {
+            super(handler);
+            audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        }
+
+        @Override
+        public boolean deliverSelfNotifications() {
+            return super.deliverSelfNotifications();
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            int musicVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            int ringVoume = audioManager.getStreamVolume(AudioManager.MODE_RINGTONE);
+
+            Log.d(TAG, "Volume now " + musicVolume + " --- " + ringVoume);
+
+            if (ringVoume == 0) {
+
+            } else if (ringVoume == 7) {
+
+            } else if (ringVoume >= 1 && ringVoume <= 2) {
+
+            } else if (ringVoume >= 3 && ringVoume <= 6) {
+
+            }
+        }
     }
 }

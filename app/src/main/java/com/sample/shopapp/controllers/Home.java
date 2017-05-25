@@ -19,6 +19,7 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -53,6 +54,7 @@ import com.sample.shopapp.utils.DisplayArea;
 import com.sample.shopapp.utils.Log;
 import com.sample.shopapp.utils.SharedPreferencesHelper;
 import com.sample.shopapp.viewhelpers.HomePagerAdapter;
+import com.stripe.android.util.LoggingUtils;
 
 import java.util.ArrayList;
 
@@ -60,16 +62,16 @@ import java.util.ArrayList;
 public class Home extends AppCompatActivity implements HostActivityInterface, HostActivityDrawerInterface {
     private static final int TAB_BAR_ICON_CART = 1;
 
-    private BaseFragment    selectedFragment;
-    private DisplayMetrics  displayMetrics;
-    private DrawerLayout    navigationDrawer;
-    private DrawerFragment  drawerFragment;
-    private ViewPager       homeViewPager;
+    private BaseFragment selectedFragment;
+    private DisplayMetrics displayMetrics;
+    private DrawerLayout navigationDrawer;
+    private DrawerFragment drawerFragment;
+    private ViewPager homeViewPager;
     private HomePagerAdapter adapter;
-    private int             lastPageSelected = 0;
+    private int lastPageSelected = 0;
     // Checkout bar
-    private LinearLayout    checkoutBar;
-    private TextView        totalItems;
+    private LinearLayout checkoutBar;
+    private TextView totalItems;
 
     Intent uiServiceIntent;
     public final static int REQUEST_CODE = 10101;
@@ -117,15 +119,14 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount()>0) {
-            if(selectedFragment == null || !selectedFragment.onBackPressed()) {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            if (selectedFragment == null || !selectedFragment.onBackPressed()) {
                 Log.d("Home : onBackPressed");
                 super.onBackPressed();
             }
-        } else if(lastPageSelected == TAB_BAR_ICON_CART && adapter.cartFragment.onBackPressed()) {
+        } else if (lastPageSelected == TAB_BAR_ICON_CART && adapter.cartFragment.onBackPressed()) {
             return;
-        }
-        else super.onBackPressed();
+        } else super.onBackPressed();
     }
 
     @Override
@@ -149,12 +150,12 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
     public void addFragment(BaseFragment fragment, boolean addToBackStack, boolean withAnimation) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         hideCheckoutBar();
-        if(withAnimation) {
+        if (withAnimation) {
             ft.setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_left, R.anim.slide_out_to_right);
         }
         if (fragment instanceof ProductsFragment) showCheckoutBar();
         ft.replace(R.id.home_fragment_container, fragment, fragment.getTagText());
-        if(addToBackStack) ft.addToBackStack(fragment.getTagText());
+        if (addToBackStack) ft.addToBackStack(fragment.getTagText());
         ft.commit();
     }
 
@@ -182,11 +183,11 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
     }
 
     private void initUI() {
-        navigationDrawer     = (DrawerLayout)   findViewById(R.id.home_container);
-        homeViewPager        = (ViewPager)      findViewById(R.id.home_view_pager);
+        navigationDrawer = (DrawerLayout) findViewById(R.id.home_container);
+        homeViewPager = (ViewPager) findViewById(R.id.home_view_pager);
         // checkout bar
-        checkoutBar          = (LinearLayout)   findViewById(R.id.home_checkout_bar);
-        totalItems           = (TextView)       findViewById(R.id.home_checkout_bar_total_items_txt);
+        checkoutBar = (LinearLayout) findViewById(R.id.home_checkout_bar);
+        totalItems = (TextView) findViewById(R.id.home_checkout_bar_total_items_txt);
     }
 
     private void setupActionBar() {
@@ -249,7 +250,7 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
             @Override
             public void onPageSelected(int position) {
                 Common.hideKeyboard(Home.this);
-                lastPageSelected=position;
+                lastPageSelected = position;
             }
 
             @Override
@@ -271,6 +272,7 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
     public void closeNavigationDrawer() {
         navigationDrawer.closeDrawer(Gravity.LEFT);
     }
+
     private void setUpDrawer() {
         navigationDrawer.setDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -368,7 +370,7 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
     }
 
     public void showCheckoutBar() {
-        if (SharedPreferencesHelper.getCache()!=null && SharedPreferencesHelper.getCache().getUser()!=null && SharedPreferencesHelper.getTotalItems()>0) {
+        if (SharedPreferencesHelper.getCache() != null && SharedPreferencesHelper.getCache().getUser() != null && SharedPreferencesHelper.getTotalItems() > 0) {
 
             checkoutBar.setVisibility(View.VISIBLE);
             totalItems.setText("Items " + String.valueOf(SharedPreferencesHelper.getTotalItems()));
@@ -451,8 +453,5 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
             stopService(uiServiceIntent);
 
         BusProvider.getInstance().unregister(this);
-
-
-
     }
 }

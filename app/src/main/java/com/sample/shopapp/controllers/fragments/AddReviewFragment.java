@@ -179,7 +179,7 @@ public class AddReviewFragment extends BaseFragment {
 
         User user = SharedPreferencesHelper.getCache().getUser();
         if(user == null) {
-            Toast.makeText(getContext(), "You need to be logged in to view the reviews", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "You need to be logged in to rootView the reviews", Toast.LENGTH_SHORT).show();
             return;
         }
         Review reviewToBeAdded = new Review();

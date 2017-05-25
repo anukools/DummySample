@@ -1,10 +1,12 @@
 package com.sample.shopapp.controllers.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -13,6 +15,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sample.shopapp.Jiny.AppUtils;
+import com.sample.shopapp.Jiny.BusEvents;
+import com.sample.shopapp.Jiny.PointerService;
+import com.sample.shopapp.Jiny.UIViewsHandler;
 import com.sample.shopapp.R;
 import com.sample.shopapp.api.ApiClient;
 import com.sample.shopapp.api.ErrorUtils;
@@ -31,7 +37,7 @@ import retrofit.Retrofit;
 /**
  * Created by vaibhav on 12/2/15.
  */
-public class SignupFragment extends BaseFragment {
+public class SignupFragment extends BaseFragment implements View.OnTouchListener {
     private static final String TAG = "SIGNUP";
     private Home home;
     private ImageView back, showPwd;
@@ -40,6 +46,8 @@ public class SignupFragment extends BaseFragment {
     private User user;
     private RelativeLayout pbContainer;
     private boolean isShown = false;
+
+    View rootView;
 
     /**
      * Use this factory method to create a new instance of
@@ -79,14 +87,31 @@ public class SignupFragment extends BaseFragment {
         home = (Home) getActivity();
         user = new User();
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_signup, container, false);
+        rootView = inflater.inflate(R.layout.fragment_signup, container, false);
+
+        rootView.setOnTouchListener(this);
+        return rootView;
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initUI(view);
         setListeners();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Layout has happened here.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (rootView != null)
+                    UIViewsHandler.handleSignUpPageViews(getActivity(), rootView);
+            }
+        }, 500);
     }
 
     private void initUI(View view) {
@@ -99,26 +124,26 @@ public class SignupFragment extends BaseFragment {
         showPwd  = (ImageView) view.findViewById(R.id.fragment_signup_show_password_img);
         pbContainer = (RelativeLayout) view.findViewById(R.id.progress_bar_container);
         password.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
+
+
     }
 
     private void setListeners() {
-        /*email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    if (TextUtils.isEmpty(email.getText()) || !Patterns.EMAIL_ADDRESS.matcher(email.getText()).matches()) {
-                        email.setError("Invalid Email");
-                    }
+                if (hasFocus) {
+                    // change focus to next view
+                    UIViewsHandler.handleSignUpPageViewClicks(getActivity(), name);
                 }
             }
         });
         name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    if (TextUtils.isEmpty(name.getText())) {
-                        name.setError("Password cannot be empty");
-                    }
+                if (hasFocus) {
+                    // change focus to next view
+                    UIViewsHandler.handleSignUpPageViewClicks(getActivity(), password);
                 }
             }
         });
@@ -126,12 +151,20 @@ public class SignupFragment extends BaseFragment {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    if (TextUtils.isEmpty(password.getText())) {
-                        password.setError("Password cannot be empty");
-                    }
+                    // change focus to next view
+                    UIViewsHandler.handleSignUpPageViewClicks(getActivity(), phone);
                 }
             }
-        });*/
+        });
+        phone.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    // change focus to next view
+                    UIViewsHandler.handleSignUpPageViewClicks(getActivity(), signup);
+                }
+            }
+        });
         showPwd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -213,5 +246,17 @@ public class SignupFragment extends BaseFragment {
 
     private void handleError(String msg) {
         Toast.makeText(home, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        PointerService.bus.post(new BusEvents.HideEvent());
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        View view1 = AppUtils.findViewAtPosition(rootView,(int) motionEvent.getX(), (int) motionEvent.getY());
+        return false;
     }
 }

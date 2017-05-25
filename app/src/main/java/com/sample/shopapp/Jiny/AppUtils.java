@@ -3,6 +3,7 @@ package com.sample.shopapp.Jiny;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
@@ -55,6 +56,28 @@ public class AppUtils {
         };
     }
 
+    public static View findViewAtPosition(View parent, int x, int y) {
+        if (parent instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup)parent;
+            for (int i=0; i<viewGroup.getChildCount(); i++) {
+                View child = viewGroup.getChildAt(i);
+                View viewAtPosition = findViewAtPosition(child, x, y);
+                if (viewAtPosition != null) {
+                    return viewAtPosition;
+                }
+            }
+            return null;
+        } else {
+            Rect rect = new Rect();
+            parent.getGlobalVisibleRect(rect);
+            if (rect.contains(x, y)) {
+                return parent;
+            } else {
+                return null;
+            }
+        }
+    }
+
     public static void showAllChildrenViews(View v) {
         ViewGroup viewgroup = (ViewGroup) v;
         for (int i = 0; i < viewgroup.getChildCount(); i++) {
@@ -64,22 +87,22 @@ public class AppUtils {
         }
     }
 
-    public static int getScreenWidth(Context context) {
+    static int getScreenWidth(Context context) {
         fetchScreenSize(context);
         return sScreenSize.x;
     }
 
-    public static int getScreenHeight(Context context) {
+    static int getScreenHeight(Context context) {
         fetchScreenSize(context);
         return sScreenSize.y;
     }
 
-    public static int dpToPx(Context context, int dp) {
+    static int dpToPx(Context context, int dp) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return (int) ((dp * displayMetrics.density) + 0.5);
     }
 
-    public static float dist(double posX, double posY, double pos2X, double pos2Y) {
+    static float dist(double posX, double posY, double pos2X, double pos2Y) {
         return (float) Math.sqrt(Math.pow(pos2X - posX, 2) + Math.pow(pos2Y - posY, 2));
     }
 

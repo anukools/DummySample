@@ -16,6 +16,11 @@ public class Log {
         if (DEBUG)
             android.util.Log.d(app, object != null ? "*** " + object.toString() : null);
     }
+    public static final void e(Object object) {
+        if (DEBUG)
+            android.util.Log.e(app, object != null ? "*** " + object.toString() : null);
+    }
+
 
     public static final void d(Object object, Throwable throwable) {
         if (DEBUG)

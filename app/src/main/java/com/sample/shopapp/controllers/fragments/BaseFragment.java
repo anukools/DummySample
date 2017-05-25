@@ -19,7 +19,7 @@ public abstract class BaseFragment extends Fragment{
     /**
      * Used to save from reinitializing Views when onViewCreated is called
      * again after a popBackStack() call. To be used only when caching
-     * view state.
+     * rootView state.
      */
     public boolean hasInitializedRootView = false;
     private View _rootView;
@@ -39,7 +39,7 @@ public abstract class BaseFragment extends Fragment{
 
 
     /**
-     * Must be used if view caching is required from onCreateView of child
+     * Must be used if rootView caching is required from onCreateView of child
      * fragment to create the rootView for it.
      *
      * This is a trick to retain View state of a fragment when removed and
@@ -47,7 +47,7 @@ public abstract class BaseFragment extends Fragment{
      *
      * However, this is not ideal and essentially a hack. This contradicts
      * Fragment's goal of being memory-friendly. This method keeps cached
-     * view state of a fragment when until it is referenced.
+     * rootView state of a fragment when until it is referenced.
      *
      * @param inflater
      * @param container
@@ -63,7 +63,7 @@ public abstract class BaseFragment extends Fragment{
             // Do not inflate the layout again.
             // The returned View of onCreateView will be added into the fragment.
             // However it is not allowed to be added twice even if the parent is same.
-            // So we must remove _rootView from the existing parent view group
+            // So we must remove _rootView from the existing parent rootView group
             // (it will be added back).
             ((ViewGroup)_rootView.getParent()).removeView(_rootView);
         }

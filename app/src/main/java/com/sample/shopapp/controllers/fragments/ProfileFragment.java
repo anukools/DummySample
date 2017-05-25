@@ -208,7 +208,7 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
         pbContainer        = (RelativeLayout) view.findViewById(R.id.progress_bar_container);
         back               = (MaterialMenuView) view.findViewById(R.id.fragment_profile_tab_bar_back_img);
         back.setState(MaterialMenuDrawable.IconState.ARROW);
-        // logged out view
+        // logged out rootView
         loggedOutContainer = (RelativeLayout) view.findViewById(R.id.fragment_profile_user_logged_out_container);
         email              = (EditText)       view.findViewById(R.id.profile_email_txt);
         password           = (EditText)       view.findViewById(R.id.profile_pwd_txt);
@@ -219,7 +219,7 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
         googleTxt          = (TextView)       view.findViewById(R.id.profile_google_txt);
         facebookImg        = (ImageView)      view.findViewById(R.id.profile_facebook_img);
         googleImg          = (ImageView)      view.findViewById(R.id.profile_google_img);
-        // logged in view
+        // logged in rootView
         loggedInContainer  = (RelativeLayout) view.findViewById(R.id.fragment_profile_user_logged_in_container);
         profileImg         = (ImageView)      view.findViewById(R.id.profile_user_img);
         profileName        = (TextView)       view.findViewById(R.id.profile_user_name);
@@ -229,7 +229,7 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
         savedCards         = (CardView)       view.findViewById(R.id.profile_user_payment_card);
         myWislist          = (CardView)       view.findViewById(R.id.profile_user_wishlist_card);
         logout             = (TextView)       view.findViewById(R.id.profile_logout_btn);
-        // edit profile view
+        // edit profile rootView
         editContainer      = (RelativeLayout) view.findViewById(R.id.fragment_profile_user_edit_container);
         editProfileImg     = (ImageView)      view.findViewById(R.id.profile_edit_user_img);
         editProfileNameTxt = (TextView)       view.findViewById(R.id.profile_edit_user_name_txt);
@@ -253,7 +253,7 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
                 // Do nothing
             }
         });
-        // logged out view
+        // logged out rootView
         email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -362,7 +362,7 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
             }
         });
 
-        // logged in view
+        // logged in rootView
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -410,7 +410,7 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
             }
         });
 
-        // edit profile view
+        // edit profile rootView
         changePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

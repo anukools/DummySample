@@ -33,7 +33,7 @@ public class JinyIcon {
     private int statusBarHeight;
 
     private ImageView jinyView;
-    private int jinyRightMargin = 100;
+    private int jinyRightMargin = 50;
 
     public JinyIcon(WindowManager windowManager, Context context, LayoutInflater inflater) {
         this.windowManager = windowManager;
@@ -67,7 +67,7 @@ public class JinyIcon {
                 PixelFormat.TRANSLUCENT);
         layoutParams.gravity = Gravity.TOP | Gravity.START;
         layoutParams.x = jinyRightMargin;
-        layoutParams.y = totalScreenHeight / 2 ;
+        layoutParams.y = totalScreenHeight / 3 ;
         layoutParams.dimAmount = 0.6f;
         layoutParams.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 

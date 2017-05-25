@@ -62,19 +62,19 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
     private User user;
     private Order order;
     private LineItemsCustomAdapter itemsCustomAdapter;
-    // no items view
+    // no items rootView
     private TextView continueShoppingBtn, blankTxt;
-    // address view
+    // address rootView
     private RelativeLayout cartAddressContainer, addEditAddressBtn;
     private AddressCardViewHelper addressCardViewHelper;
     private TextView continueToPayment;
-    // payment view
+    // payment rootView
     private RelativeLayout addEditPaymentBtn, cartPaymentContainer;
     private PaymentCardViewHelper paymentCardViewHelper;
     private TextView pay;
-    // refresh view
+    // refresh rootView
     private TextView refresh;
-    // confirm view
+    // confirm rootView
     private RelativeLayout cartConfirmContainer;
     private TextView confirmItemsTxt, confirmPriceTxt;
     private LinearLayout confirmScrollView, confirmBtn;
@@ -154,22 +154,22 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
         totalPrice      = (TextView)       view.findViewById(R.id.fragment_cart_checkout_bar_total_price_txt);
         pbContainer     = (RelativeLayout) view.findViewById(R.id.progress_bar_container);
         checkoutBar     = (RelativeLayout) view.findViewById(R.id.fragment_cart_checkout_bar);
-        // no items view
+        // no items rootView
         blankCart            = (LinearLayout)   view.findViewById(R.id.fragment_cart_blank_container);
         continueShoppingBtn  = (TextView)       view.findViewById(R.id.fragment_cart_blank_continue_shopping_btn);
         blankTxt             = (TextView)       view.findViewById(R.id.fragment_cart_blank_txt);
-        // address view
+        // address rootView
         addEditAddressBtn    = (RelativeLayout) view.findViewById(R.id.cart_address_item_edit_img_container);
         cartAddressContainer = (RelativeLayout) view.findViewById(R.id.fragment_cart_address_container);
         continueToPayment    = (TextView)       view.findViewById(R.id.fragment_cart_address_to_payment_btn);
-        // payment view
+        // payment rootView
         addEditPaymentBtn    = (RelativeLayout) view.findViewById(R.id.cart_payment_item_edit_img_container);
         cartPaymentContainer = (RelativeLayout) view.findViewById(R.id.fragment_cart_payment_container);
 
         pay                  = (TextView)       view.findViewById(R.id.fragment_cart_payment_pay_btn);
-        // refresh view
+        // refresh rootView
         refresh              = (TextView)       view.findViewById(R.id.fragment_cart_refresh_btn);
-        // confirm view
+        // confirm rootView
         cartConfirmContainer = (RelativeLayout) view.findViewById(R.id.fragment_cart_confirm_container);
         confirmItemsTxt      = (TextView)       view.findViewById(R.id.fragment_cart_confirm_bar_total_items_txt);
         confirmPriceTxt      = (TextView)       view.findViewById(R.id.fragment_cart_confirm_bar_total_price_txt);
@@ -190,14 +190,14 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
                 setupAddressView(order.getShippingAddress());
             }
         });
-        // no items view
+        // no items rootView
         continueShoppingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 home.showDashboard();
             }
         });
-        // address view
+        // address rootView
         addEditAddressBtn.setVisibility(View.VISIBLE);
         addEditAddressBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -215,7 +215,7 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
                 moveToPaymentState();
             }
         });
-        // payment view
+        // payment rootView
         addEditPaymentBtn.setVisibility(View.VISIBLE);
         addEditPaymentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -233,14 +233,14 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
                 moveToConfirmState();
             }
         });
-        // refresh view
+        // refresh rootView
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getCurrentOrder();
             }
         });
-        // confirm view
+        // confirm rootView
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -570,7 +570,7 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
                 if (response.isSuccess()) {
                     Log.d("CartFragment > moveToPaymentState > call1 > onResponse");
                     order = response.body();
-                    // if order is in payment state then setup payemnt view
+                    // if order is in payment state then setup payemnt rootView
                     if (order.getState().equals("payment")) {
                         hideLoader();
                         setupPaymentView(order.getPayments().isEmpty() ? null : order.getPayments().get(0));
@@ -648,7 +648,7 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
                 if (response.isSuccess()) {
                     Log.d("CartFragment > moveToConfirmState > call1 > onResponse");
                     order = response.body();
-                    // if order is in confirm state then setup confirm view
+                    // if order is in confirm state then setup confirm rootView
                     if (order.getState().equals("confirm")) {
                         hideLoader();
                         setupConfirmView();
@@ -664,7 +664,7 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
                                 if (response.isSuccess()) {
                                     Log.d("CartFragment > moveToConfirmState > call2 > onResponse");
                                     order = response.body();
-                                    // if order is in confirm state then setup confirm view
+                                    // if order is in confirm state then setup confirm rootView
                                     if (order.getState().equals("confirm")) {
                                         hideLoader();
                                         setupConfirmView();

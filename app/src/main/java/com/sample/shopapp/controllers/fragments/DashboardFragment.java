@@ -76,7 +76,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Initialize view present in scroll view
+        // Initialize rootView present in scroll rootView
         initUI(view);
 
         // Get data from cache
@@ -84,9 +84,9 @@ public class DashboardFragment extends Fragment {
         if (SharedPreferencesHelper.getCache()!=null && !SharedPreferencesHelper.getCache().getDashboardData().isEmpty()) {
             dashboardData.addAll(SharedPreferencesHelper.getCache().getDashboardData());
         }
-        // Setup Current Offers view pager
+        // Setup Current Offers rootView pager
         setupCurrentOffersViewPager(dashboardData.get(0).getBanners());
-        // Adding view programmatically in scroll view
+        // Adding rootView programmatically in scroll rootView
         addCurrentOffersViewPagerMarkerToUI(dashboardData.get(0).getBanners());
         dashboardData.remove(0);
         for (BannerTypes bannerTypes : dashboardData) {

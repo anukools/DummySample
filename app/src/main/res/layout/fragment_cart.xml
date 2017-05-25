@@ -146,7 +146,7 @@
         android:layout_below="@id/fragment_cart_tab_bar"
         android:id="@+id/fragment_cart_payment_container"
         android:gravity="center"
-        android:visibility="gone"
+        android:visibility="visible"
         >
         <include
             android:layout_width="match_parent"
@@ -157,6 +157,19 @@
         </include>
 
         <com.sample.shopapp.views.CustomFontTextView
+            android:id="@+id/cod_payment_item_header_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cash On Delivery"
+            android:padding="10dp"
+            android:background="@drawable/product_detail_spec_list_item_white_bg"
+            android:layout_below="@+id/fragment_cart_payment_card"
+            custom:typeface="roboto_medium.ttf"
+            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/text_size_18sp"/>
+
+        <com.sample.shopapp.views.CustomFontTextView
             android:layout_width="match_parent"
             android:layout_gravity="center_vertical"
             android:background="@drawable/filters_apply_button"
@@ -164,7 +177,7 @@
             android:layout_marginRight="@dimen/margin_10dp"
             android:layout_marginLeft="@dimen/margin_10dp"
             android:layout_marginTop="@dimen/margin_40dp"
-            android:layout_below="@id/fragment_cart_payment_card"
+            android:layout_below="@id/cod_payment_item_header_txt"
             android:layout_centerHorizontal="true"
             android:text="@string/pay"
             android:textAllCaps="true"
@@ -175,6 +188,7 @@
             custom:typeface="roboto_regular.ttf"
             >
         </com.sample.shopapp.views.CustomFontTextView>
+
     </RelativeLayout>
 
     <!-- confirm view -->

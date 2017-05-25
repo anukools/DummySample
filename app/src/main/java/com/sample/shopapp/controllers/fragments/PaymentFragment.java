@@ -155,7 +155,7 @@ public class PaymentFragment extends BaseFragment {
         name                    = (EditText)             view.findViewById(R.id.fragment_payment_name_txt);
         month                   = (EditText)             view.findViewById(R.id.fragment_payment_month_txt);
         year                    = (EditText)             view.findViewById(R.id.fragment_payment_year_txt);
-//        cvv                     = (EditText)             view.findViewById(R.id.fragment_payment_cvv_txt);
+//        cvv                     = (EditText)             rootView.findViewById(R.id.fragment_payment_cvv_txt);
         save                    = (ImageButton)          view.findViewById(R.id.fragment_payment_save_btn);
     }
 
