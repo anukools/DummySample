@@ -36,10 +36,15 @@ public class UIViewsHandler {
         // get home recycler view
         View cartButton = view.findViewById(R.id.add_to_cart);
         if (cartButton != null) {
+            Rect rect = new Rect();
+            cartButton.getGlobalVisibleRect(rect);
+
+            Log.e("cartButton CoOrd : ", rect.exactCenterX() + " - " + rect.exactCenterY());
+
             BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
-            event.setX(60);
-            event.setY(AppUtils.getScreenHeight(context)  - 130 );
-            event.setGravity(Gravity.TOP | Gravity.END);
+            event.setX(rect.exactCenterX());
+            event.setY(rect.exactCenterY());
+            event.setGravity(Gravity.TOP | Gravity.START);
             event.setSoundResId(R.raw.checkout);
             PointerService.bus.post(event);
         }
@@ -81,6 +86,53 @@ public class UIViewsHandler {
 
 
 
+    public static void handleSignInPageViews(Context context, View view) {
+        View emailView =  view.findViewById(R.id.profile_email_txt);
+        Rect rect = new Rect();
+        emailView.getGlobalVisibleRect(rect);
+
+        Log.e("Email View CoOrd : ", rect.exactCenterX() + " - " + rect.exactCenterY());
+
+        BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
+        event.setX(rect.exactCenterX());
+        event.setY(rect.exactCenterY());
+        event.setSoundResId(R.raw.search);
+        event.setGravity(Gravity.TOP | Gravity.START);
+        PointerService.bus.post(event);
+    }
+
+    public static void handleSignInPageViewClicks(Context context, View view) {
+        if(view != null){
+            Rect rect = new Rect();
+            view.getGlobalVisibleRect(rect);
+
+            Log.e("Email View CoOrd : ", rect.exactCenterX() + " - " + rect.exactCenterY());
+
+            BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
+            event.setX(rect.exactCenterX());
+            event.setY(rect.exactCenterY());
+            event.setSoundResId(R.raw.search);
+            event.setGravity(Gravity.TOP | Gravity.START);
+            PointerService.bus.post(event);
+        }
+    }
+
+    public static void handlePageViewFocusChanges(Context context, View view) {
+        if(view != null){
+            Rect rect = new Rect();
+            view.getGlobalVisibleRect(rect);
+
+            Log.e("Email View CoOrd : ", rect.exactCenterX() + " - " + rect.exactCenterY());
+
+            BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
+            event.setX(rect.exactCenterX());
+            event.setY(rect.exactCenterY());
+            event.setSoundResId(R.raw.search);
+            event.setGravity(Gravity.TOP | Gravity.START);
+            PointerService.bus.post(event);
+        }
+    }
+
     public static void handleSignUpPageViews(Context context, View view) {
         View emailView =  view.findViewById(R.id.fragment_signup_email_txt);
         Rect rect = new Rect();
@@ -96,10 +148,11 @@ public class UIViewsHandler {
         PointerService.bus.post(event);
     }
 
-    public static void handleSignUpPageViewClicks(Context context, View view) {
-        if(view != null){
+    public static void handleSignAddressPageViews(Context context, View view) {
+        View addAddressButton =  view.findViewById(R.id.fragment_address_fab);
+        if(addAddressButton.getVisibility() ==  View.VISIBLE){
             Rect rect = new Rect();
-            view.getGlobalVisibleRect(rect);
+            addAddressButton.getGlobalVisibleRect(rect);
 
             Log.e("Email View CoOrd : ", rect.exactCenterX() + " - " + rect.exactCenterY());
 
@@ -110,5 +163,6 @@ public class UIViewsHandler {
             event.setGravity(Gravity.TOP | Gravity.START);
             PointerService.bus.post(event);
         }
+
     }
 }

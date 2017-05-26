@@ -70,6 +70,7 @@ public class PointerIcon {
                         | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                         | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                         | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 PixelFormat.TRANSLUCENT);
         layoutParams.gravity = Gravity.TOP | Gravity.END;
@@ -104,7 +105,7 @@ public class PointerIcon {
                         pointerView.setVisibility(View.VISIBLE);
                         layoutParams.gravity = gravity;
                         layoutParams.x = Math.round(xCord);
-                        layoutParams.y = Math.round(yCord);
+                        layoutParams.y = Math.round(yCord - statusBarHeight);
 
                         windowManager.updateViewLayout(pointerView, layoutParams);
                     }

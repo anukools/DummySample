@@ -196,8 +196,10 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
         setSupportActionBar(toolbar);
 
         final ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeAsUpIndicator(R.drawable.menu_icon);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.menu_icon);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private void setupPager() {
@@ -215,7 +217,9 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
         // Iterate over all tabs and set the custom view
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             TabLayout.Tab tab = tabLayout.getTabAt(i);
-            tab.setCustomView(adapter.getTabView(i));
+            if (tab != null) {
+                tab.setCustomView(adapter.getTabView(i));
+            }
         }
 
 

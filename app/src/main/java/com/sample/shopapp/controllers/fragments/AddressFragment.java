@@ -1,6 +1,7 @@
 package com.sample.shopapp.controllers.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -20,6 +21,9 @@ import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.balysv.materialmenu.MaterialMenuView;
+import com.sample.shopapp.Jiny.BusEvents;
+import com.sample.shopapp.Jiny.PointerService;
+import com.sample.shopapp.Jiny.UIViewsHandler;
 import com.squareup.otto.Subscribe;
 import com.sample.shopapp.R;
 import com.sample.shopapp.api.ApiClient;
@@ -56,22 +60,22 @@ public class AddressFragment extends BaseFragment {
     private static final String SELECTED_ADDRESS_FOR_CHECKOUT = "selected_address_for_checkout";
 
     private Home home;
-    private int mode=MODE_VIEW;
+    private int mode = MODE_VIEW;
     private String userToken;
 
     private ArrayList<Address> addresses = new ArrayList<>();
     private ArrayList<State> stateArrayList = new ArrayList<>();
 
-    private boolean                 isSelector;
-    private MaterialMenuView        back;
-    private TextView                title;
-    private LinearLayout            noAddressFoundContainer;
-    private FloatingActionButton    addAddressBtn;
-    private ListView                addressListView;
-    private RelativeLayout          pbContainer;
+    private boolean isSelector;
+    private MaterialMenuView back;
+    private TextView title;
+    private LinearLayout noAddressFoundContainer;
+    private FloatingActionButton addAddressBtn;
+    private ListView addressListView;
+    private RelativeLayout pbContainer;
 
-    private ScrollView              addOrEditContainer;
-    private int                     stateSpinnerSelectedItem;
+    private ScrollView addOrEditContainer;
+    private int stateSpinnerSelectedItem;
     private AddressesCustomAdapter adapter;
     private Address selectedAddressForEditOrRemoval, newAddress, selectedAddressForCheckout;
 
@@ -80,6 +84,7 @@ public class AddressFragment extends BaseFragment {
     private EditText city, pincode, phone;
     private ImageButton save;
     private Spinner stateSpinner;
+    private View rootView;
 
     /**
      * Use this factory method to create a new instance of
@@ -109,7 +114,7 @@ public class AddressFragment extends BaseFragment {
     @Override
     public boolean onBackPressed() {
         Log.d("AddressFragment : onBackPressed");
-        if(mode == MODE_ADD || mode == MODE_EDIT) {
+        if (mode == MODE_ADD || mode == MODE_EDIT) {
             mode = MODE_VIEW;
             showViewModeContent();
             showAddresses();
@@ -123,10 +128,10 @@ public class AddressFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments()!=null) {
+        if (getArguments() != null) {
             userToken = getArguments().getString(USER_TOKEN);
             isSelector = getArguments().getBoolean(IS_SELECTOR);
-            selectedAddressForCheckout = getArguments().getSerializable(SELECTED_ADDRESS_FOR_CHECKOUT)==null ? null : (Address) getArguments().getSerializable(SELECTED_ADDRESS_FOR_CHECKOUT);
+            selectedAddressForCheckout = getArguments().getSerializable(SELECTED_ADDRESS_FOR_CHECKOUT) == null ? null : (Address) getArguments().getSerializable(SELECTED_ADDRESS_FOR_CHECKOUT);
         }
         home = (Home) getActivity();
         BusProvider.getInstance().register(this);
@@ -136,13 +141,8 @@ public class AddressFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_address, container, false);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        BusProvider.getInstance().unregister(this);
+        rootView = inflater.inflate(R.layout.fragment_address, container, false);
+        return rootView;
     }
 
     @Override
@@ -155,35 +155,37 @@ public class AddressFragment extends BaseFragment {
     }
 
     private void initUI(View view) {
-       // common
-        pbContainer             = (RelativeLayout)       view.findViewById(R.id.progress_bar_container);
-        back                    = (MaterialMenuView)     view.findViewById(R.id.fragment_address_tab_bar_back_img);
-        title                   = (TextView)             view.findViewById(R.id.fragment_address_tab_bar_txt);
+        // common
+        pbContainer = (RelativeLayout) view.findViewById(R.id.progress_bar_container);
+        back = (MaterialMenuView) view.findViewById(R.id.fragment_address_tab_bar_back_img);
+        title = (TextView) view.findViewById(R.id.fragment_address_tab_bar_txt);
         back.setState(MaterialMenuDrawable.IconState.ARROW);
         // View mode
-        noAddressFoundContainer = (LinearLayout)         view.findViewById(R.id.fragment_address_blank_container);
-        addAddressBtn           = (FloatingActionButton) view.findViewById(R.id.fragment_address_fab);
-        addressListView         = (ListView)             view.findViewById(R.id.fragment_address_list_view);
+        noAddressFoundContainer = (LinearLayout) view.findViewById(R.id.fragment_address_blank_container);
+        addAddressBtn = (FloatingActionButton) view.findViewById(R.id.fragment_address_fab);
+        addressListView = (ListView) view.findViewById(R.id.fragment_address_list_view);
         // ADD or EDIT mode
-        addOrEditContainer      = (ScrollView)           view.findViewById(R.id.fragment_address_scroll_view);
-        firstName               = (EditText)             view.findViewById(R.id.fragment_address_first_name_txt);
-        lastName                = (EditText)             view.findViewById(R.id.fragment_address_last_name_txt);
-        addressLine1            = (EditText)             view.findViewById(R.id.fragment_address_line1_txt);
-        addressLine2            = (EditText)             view.findViewById(R.id.fragment_address_line2_txt);
-        city                    = (EditText)             view.findViewById(R.id.fragment_address_city_txt);
-        pincode                 = (EditText)             view.findViewById(R.id.fragment_address_pincode_txt);
-        phone                   = (EditText)             view.findViewById(R.id.fragment_address_phone_txt);
-        save                    = (ImageButton)          view.findViewById(R.id.fragment_address_save_btn);
-        stateSpinner            = (Spinner)              view.findViewById(R.id.fragment_address_state_spinner);
+        addOrEditContainer = (ScrollView) view.findViewById(R.id.fragment_address_scroll_view);
+        firstName = (EditText) view.findViewById(R.id.fragment_address_first_name_txt);
+        lastName = (EditText) view.findViewById(R.id.fragment_address_last_name_txt);
+        addressLine1 = (EditText) view.findViewById(R.id.fragment_address_line1_txt);
+        addressLine2 = (EditText) view.findViewById(R.id.fragment_address_line2_txt);
+        city = (EditText) view.findViewById(R.id.fragment_address_city_txt);
+        pincode = (EditText) view.findViewById(R.id.fragment_address_pincode_txt);
+        phone = (EditText) view.findViewById(R.id.fragment_address_phone_txt);
+        save = (ImageButton) view.findViewById(R.id.fragment_address_save_btn);
+        stateSpinner = (Spinner) view.findViewById(R.id.fragment_address_state_spinner);
         setStateSpinnerAdapter();
     }
 
     private void setValuesBasedOnMode() {
         switch (mode) {
-            case MODE_VIEW: title.setText(home.getResources().getString(R.string.addresses));
+            case MODE_VIEW:
+                title.setText(home.getResources().getString(R.string.addresses));
                 if (isSelector) title.setText("Delivery Address");
                 break;
-            case MODE_ADD: title.setText(home.getResources().getString(R.string.add_address));
+            case MODE_ADD:
+                title.setText(home.getResources().getString(R.string.add_address));
                 firstName.setText("");
                 lastName.setText("");
                 addressLine1.setText("");
@@ -192,7 +194,8 @@ public class AddressFragment extends BaseFragment {
                 phone.setText("");
                 pincode.setText("");
                 break;
-            case MODE_EDIT: title.setText(home.getResources().getString(R.string.edit_address));
+            case MODE_EDIT:
+                title.setText(home.getResources().getString(R.string.edit_address));
                 firstName.setText(selectedAddressForEditOrRemoval.getFirstName());
                 lastName.setText(selectedAddressForEditOrRemoval.getLastName());
                 addressLine1.setText(selectedAddressForEditOrRemoval.getAddressLine1());
@@ -200,7 +203,8 @@ public class AddressFragment extends BaseFragment {
                 city.setText(selectedAddressForEditOrRemoval.getCity());
                 for (State state :
                         stateArrayList) {
-                    if (selectedAddressForEditOrRemoval.getStateId().equals(state.getId())) stateSpinner.setSelection(stateArrayList.indexOf(state));
+                    if (selectedAddressForEditOrRemoval.getStateId().equals(state.getId()))
+                        stateSpinner.setSelection(stateArrayList.indexOf(state));
                 }
                 phone.setText(selectedAddressForEditOrRemoval.getPhone());
                 pincode.setText(selectedAddressForEditOrRemoval.getZipcode());
@@ -209,7 +213,7 @@ public class AddressFragment extends BaseFragment {
     }
 
     private void setStateSpinnerAdapter() {
-        if (SharedPreferencesHelper.getCache()!=null && SharedPreferencesHelper.getCache().getStatesList()!=null
+        if (SharedPreferencesHelper.getCache() != null && SharedPreferencesHelper.getCache().getStatesList() != null
                 && !SharedPreferencesHelper.getCache().getStatesList().isEmpty()) {
             stateArrayList = SharedPreferencesHelper.getCache().getStatesList();
             String[] stateNames = new String[stateArrayList.size()];
@@ -241,6 +245,9 @@ public class AddressFragment extends BaseFragment {
             public void onClick(View v) {
                 mode = MODE_ADD;
                 showAddOrEditModeContent();
+
+                // hide when user is adding new address
+                PointerService.bus.post(new BusEvents.HideEvent());
             }
         });
         addressListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -270,6 +277,7 @@ public class AddressFragment extends BaseFragment {
                             editAddress();
                             break;
                     }
+                PointerService.bus.post(new BusEvents.HideEvent());
             }
         });
 
@@ -284,6 +292,18 @@ public class AddressFragment extends BaseFragment {
 
             }
         });
+
+        firstName.setOnFocusChangeListener(focusChangeListener);
+        lastName.setOnFocusChangeListener(focusChangeListener);
+        addressLine1.setOnFocusChangeListener(focusChangeListener);
+        addressLine2.setOnFocusChangeListener(focusChangeListener);
+        city.setOnFocusChangeListener(focusChangeListener);
+        pincode.setOnFocusChangeListener(focusChangeListener);
+        phone.setOnFocusChangeListener(focusChangeListener);
+        stateSpinner.setOnFocusChangeListener(focusChangeListener);
+
+
+
     }
 
     private void loadAddresses() {
@@ -397,7 +417,7 @@ public class AddressFragment extends BaseFragment {
 
     private void hideLoader() {
         pbContainer.setVisibility(View.GONE);
-        if (mode==MODE_VIEW) addAddressBtn.setVisibility(View.VISIBLE);
+        if (mode == MODE_VIEW) addAddressBtn.setVisibility(View.VISIBLE);
     }
 
     private void showViewModeContent() {
@@ -422,8 +442,7 @@ public class AddressFragment extends BaseFragment {
         if (event.operationType.equals("Edit")) {
             mode = MODE_EDIT;
             showAddOrEditModeContent();
-        }
-        else {
+        } else {
             mode = MODE_VIEW;
             setValuesBasedOnMode();
             removeAddress();
@@ -443,8 +462,7 @@ public class AddressFragment extends BaseFragment {
                     loadAddresses();
                     mode = MODE_VIEW;
                     setValuesBasedOnMode();
-                }
-                else {
+                } else {
                     handleError(response.errorBody().toString());
                 }
             }
@@ -471,8 +489,7 @@ public class AddressFragment extends BaseFragment {
                     loadAddresses();
                     mode = MODE_VIEW;
                     setValuesBasedOnMode();
-                }
-                else {
+                } else {
                     handleError(response.errorBody().toString());
                 }
             }
@@ -508,4 +525,61 @@ public class AddressFragment extends BaseFragment {
             }
         });
     }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+
+        PointerService.bus.post(new BusEvents.HideEvent());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Layout has happened here.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (rootView != null)
+                    UIViewsHandler.handleSignAddressPageViews(getActivity(), rootView);
+            }
+        }, 500);
+    }
+
+    View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View view, boolean hasFocus) {
+            if (hasFocus) {
+                switch (view.getId()) {
+                    case R.id.fragment_address_first_name_txt:
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), lastName);
+                        break;
+                    case R.id.fragment_address_last_name_txt:
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), addressLine1);
+                        break;
+                    case R.id.fragment_address_line1_txt:
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), addressLine2);
+                        break;
+                    case R.id.fragment_address_line2_txt:
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), city);
+                        break;
+                    case R.id.fragment_address_city_txt:
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), stateSpinner);
+                        break;
+                    case R.id.fragment_address_state_spinner:
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), pincode);
+                        break;
+                    case R.id.fragment_address_pincode_txt:
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), phone);
+                        break;
+                    case R.id.fragment_address_phone_txt:
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), save);
+                        break;
+                }
+            }
+        }
+    };
 }

@@ -4,6 +4,7 @@ package com.sample.shopapp.controllers.fragments;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
@@ -36,6 +37,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.sample.shopapp.Jiny.BusEvents;
+import com.sample.shopapp.Jiny.PointerService;
+import com.sample.shopapp.Jiny.UIViewsHandler;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -106,6 +110,8 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
     private static final int USER_LOGIN_FACEBOOK = 1002;
     private static final int USER_LOGIN_GOOGLE   = 1003;
     private int loggedInMode = 1000;
+    private View rootView;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -178,16 +184,11 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        BusProvider.getInstance().unregister(this);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        rootView =  inflater.inflate(R.layout.fragment_profile, container, false);
+        return rootView;
     }
 
     @Override
@@ -261,6 +262,19 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
                     if (!TextUtils.isEmpty(email.getText()) && Patterns.EMAIL_ADDRESS.matcher(email.getText()).matches()) {
                         user.setEmail(email.getText().toString());
                     } else email.setError("Invalid Email");
+                }else {
+                    // change focus to next view
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), password);
+                }
+            }
+        });
+
+        password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    // change focus to next view
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), login);
                 }
             }
         });
@@ -726,4 +740,30 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
             }
         });
     }
+
+
+    /* Jiny Code */
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+
+        PointerService.bus.post(new BusEvents.HideEvent());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Layout has happened here.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (rootView != null)
+                    UIViewsHandler.handleSignInPageViews(getActivity(), rootView);
+            }
+        }, 500);
+    }
+
 }

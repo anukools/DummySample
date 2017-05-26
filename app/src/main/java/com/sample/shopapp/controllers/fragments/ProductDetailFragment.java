@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -653,8 +654,16 @@ public class ProductDetailFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
 
-        if (rootView != null)
-            UIViewsHandler.handleProductDetailPageView(getActivity(), rootView);
+        // Layout has happened here.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (rootView != null)
+                    UIViewsHandler.handleProductDetailPageView(getActivity(), rootView);
+            }
+        }, 1000);
+
 
     }
 
