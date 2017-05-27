@@ -531,7 +531,11 @@ public class AddressFragment extends BaseFragment {
     public void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
         PointerService.bus.post(new BusEvents.HideEvent());
     }
 
@@ -555,28 +559,28 @@ public class AddressFragment extends BaseFragment {
             if (hasFocus) {
                 switch (view.getId()) {
                     case R.id.fragment_address_first_name_txt:
-                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), lastName);
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), lastName, R.raw.name_input);
                         break;
                     case R.id.fragment_address_last_name_txt:
-                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), addressLine1);
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), addressLine1,R.raw.address );
                         break;
                     case R.id.fragment_address_line1_txt:
-                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), addressLine2);
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), addressLine2, R.raw.address);
                         break;
                     case R.id.fragment_address_line2_txt:
-                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), city);
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), city, R.raw.city_name);
                         break;
                     case R.id.fragment_address_city_txt:
-                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), stateSpinner);
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), stateSpinner, R.raw.state_name);
                         break;
                     case R.id.fragment_address_state_spinner:
-                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), pincode);
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), pincode, R.raw.pincode);
                         break;
                     case R.id.fragment_address_pincode_txt:
-                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), phone);
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), phone, R.raw.phone_number);
                         break;
                     case R.id.fragment_address_phone_txt:
-                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), save);
+                        UIViewsHandler.handlePageViewFocusChanges(getActivity(), save, R.raw.save_address);
                         break;
                 }
             }

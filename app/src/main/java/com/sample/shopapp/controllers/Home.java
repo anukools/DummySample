@@ -458,4 +458,10 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
 
         BusProvider.getInstance().unregister(this);
     }
+
+//    @Override
+//    public boolean dispatchTouchEvent (MotionEvent ev) {
+//        // Do your calcluations
+//        return super.dispatchTouchEvent(ev);
+//    }
 }

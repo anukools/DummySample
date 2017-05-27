@@ -31,6 +31,14 @@ public class BusEvents {
 
     }
 
+    public static class ShowPaymentEvent {
+
+    }
+
+    public static class HidePaymentEvent {
+
+    }
+
     public static class AnimateEvent {
         int x;
         int y;

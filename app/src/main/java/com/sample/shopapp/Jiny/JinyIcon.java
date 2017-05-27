@@ -110,8 +110,8 @@ public class JinyIcon {
         }
     }
 
-    public void removePointer() {
-        if (jinyView != null)
+    public void removeJiny() {
+        if (jinyView != null && jinyView.isAttachedToWindow())
             windowManager.removeView(jinyView);
     }
 

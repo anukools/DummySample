@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sample.shopapp.Jiny.AppUtils;
 import com.sample.shopapp.Jiny.BusEvents;
 import com.sample.shopapp.Jiny.PointerService;
 import com.sample.shopapp.Jiny.UIViewsHandler;
@@ -133,7 +134,7 @@ public class SignupFragment extends BaseFragment implements View.OnTouchListener
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     // change focus to next view
-                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), name);
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), name, R.raw.name_input);
                 }
             }
         });
@@ -142,7 +143,7 @@ public class SignupFragment extends BaseFragment implements View.OnTouchListener
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     // change focus to next view
-                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), password);
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), password, R.raw.name_input);
                 }
             }
         });
@@ -151,7 +152,7 @@ public class SignupFragment extends BaseFragment implements View.OnTouchListener
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     // change focus to next view
-                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), phone);
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), phone, R.raw.phone_number);
                 }
             }
         });
@@ -160,7 +161,7 @@ public class SignupFragment extends BaseFragment implements View.OnTouchListener
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     // change focus to next view
-                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), signup);
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), signup, R.raw.phone_number);
                 }
             }
         });
@@ -248,14 +249,15 @@ public class SignupFragment extends BaseFragment implements View.OnTouchListener
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
         PointerService.bus.post(new BusEvents.HideEvent());
     }
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-//        View view1 = AppUtils.findViewAtPosition(rootView,(int) motionEvent.getX(), (int) motionEvent.getY());
+        View view1 = AppUtils.findViewAtPosition(view,(int) motionEvent.getX(), (int) motionEvent.getY());
+        Log.e("View below onTouch" + view1);
         return false;
     }
 }

@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -105,13 +107,31 @@ public class PointerService extends Service {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Subscribe
     public void removePointerUIEvent(BusEvents.RemoveEvent event) {
-        pointerIcon.hide();
-        jinyIcon.hide();
-
+        pointerIcon.removePointer();
+        jinyIcon.removeJiny();
     }
 
+    @Subscribe
+    public void showPaymentBranchEvent(BusEvents.ShowPaymentEvent event){
+        pointerIcon.showPaymentView();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                soundPlayer.play(getApplicationContext(), R.raw.payment_method);
+            }
+        }, 500);
+    }
+
+    @Subscribe
+    public void hidePaymentBranchEvent(BusEvents.HidePaymentEvent event){
+        pointerIcon.hidePaymentView();
+
+        soundPlayer.stop();
+    }
 
     @Nullable
     @Override
@@ -129,7 +149,7 @@ public class PointerService extends Service {
         }
         // remove views from the window
         if (jinyIcon != null) {
-            jinyIcon.removePointer();
+            jinyIcon.removeJiny();
         }
 
         PointerService.bus.unregister(this);

@@ -96,28 +96,12 @@ public class UIViewsHandler {
         BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
         event.setX(rect.exactCenterX());
         event.setY(rect.exactCenterY());
-        event.setSoundResId(R.raw.search);
+        event.setSoundResId(R.raw.name_input);
         event.setGravity(Gravity.TOP | Gravity.START);
         PointerService.bus.post(event);
     }
 
-    public static void handleSignInPageViewClicks(Context context, View view) {
-        if(view != null){
-            Rect rect = new Rect();
-            view.getGlobalVisibleRect(rect);
-
-            Log.e("Email View CoOrd : ", rect.exactCenterX() + " - " + rect.exactCenterY());
-
-            BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
-            event.setX(rect.exactCenterX());
-            event.setY(rect.exactCenterY());
-            event.setSoundResId(R.raw.search);
-            event.setGravity(Gravity.TOP | Gravity.START);
-            PointerService.bus.post(event);
-        }
-    }
-
-    public static void handlePageViewFocusChanges(Context context, View view) {
+    public static void handlePageViewFocusChanges(Context context, View view, int sound) {
         if(view != null){
             Rect rect = new Rect();
             view.getGlobalVisibleRect(rect);
@@ -143,7 +127,7 @@ public class UIViewsHandler {
         BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
         event.setX(rect.exactCenterX());
         event.setY(rect.exactCenterY());
-        event.setSoundResId(R.raw.search);
+        event.setSoundResId(R.raw.name_input);
         event.setGravity(Gravity.TOP | Gravity.START);
         PointerService.bus.post(event);
     }
@@ -159,10 +143,26 @@ public class UIViewsHandler {
             BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
             event.setX(rect.exactCenterX());
             event.setY(rect.exactCenterY());
-            event.setSoundResId(R.raw.search);
+            event.setSoundResId(R.raw.address);
             event.setGravity(Gravity.TOP | Gravity.START);
             PointerService.bus.post(event);
         }
+    }
 
+    public static void handlePaymentPageViews(Context context, View view) {
+        View addAddressButton =  view.findViewById(R.id.fragment_payment_name_txt);
+        if(addAddressButton.getVisibility() ==  View.VISIBLE){
+            Rect rect = new Rect();
+            addAddressButton.getGlobalVisibleRect(rect);
+
+            Log.e("Email View CoOrd : ", rect.exactCenterX() + " - " + rect.exactCenterY());
+
+            BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
+            event.setX(rect.exactCenterX());
+            event.setY(rect.exactCenterY());
+            event.setSoundResId(R.raw.name_input);
+            event.setGravity(Gravity.TOP | Gravity.START);
+            PointerService.bus.post(event);
+        }
     }
 }

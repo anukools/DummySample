@@ -670,8 +670,6 @@ public class ProductDetailFragment extends BaseFragment {
     @Override
     public void onPause() {
         super.onPause();
-
-
         // hide when the rootView changed
         PointerService.bus.post(new BusEvents.HideEvent());
     }

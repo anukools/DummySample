@@ -264,7 +264,7 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
                     } else email.setError("Invalid Email");
                 }else {
                     // change focus to next view
-                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), password);
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), password, R.raw.name_input);
                 }
             }
         });
@@ -274,7 +274,7 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     // change focus to next view
-                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), login);
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), login, R.raw.name_input );
                 }
             }
         });
@@ -741,14 +741,17 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
         });
     }
 
-
-    /* Jiny Code */
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
+    }
 
+    /* Jiny Code */
+
+    @Override
+    public void onPause() {
+        super.onPause();
         PointerService.bus.post(new BusEvents.HideEvent());
     }
 
@@ -760,7 +763,7 @@ public class ProfileFragment extends BaseFragment implements GoogleApiClient.OnC
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (rootView != null)
+                if (rootView != null && email.getVisibility() == View.VISIBLE)
                     UIViewsHandler.handleSignInPageViews(getActivity(), rootView);
             }
         }, 500);

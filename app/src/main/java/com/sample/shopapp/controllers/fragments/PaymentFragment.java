@@ -1,6 +1,7 @@
 package com.sample.shopapp.controllers.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -19,6 +20,9 @@ import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 import com.balysv.materialmenu.MaterialMenuView;
+import com.sample.shopapp.Jiny.BusEvents;
+import com.sample.shopapp.Jiny.PointerService;
+import com.sample.shopapp.Jiny.UIViewsHandler;
 import com.squareup.otto.Subscribe;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
@@ -60,7 +64,7 @@ public class PaymentFragment extends BaseFragment {
     private RelativeLayout pbContainer;
     private static final int MODE_ADD = 2;
     private static final int MODE_VIEW = 1;
-    private int mode=MODE_VIEW;
+    private int mode = MODE_VIEW;
     private String userToken;
     private boolean isSelector;
     private CardsCustomAdapter adapter;
@@ -73,6 +77,8 @@ public class PaymentFragment extends BaseFragment {
     // Add mode
     private EditText cardNumber, name, month, year, cvv;
     private ImageButton save;
+
+    private View rootView;
 
     /**
      * Use this factory method to create a new instance of
@@ -108,10 +114,10 @@ public class PaymentFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments()!=null) {
+        if (getArguments() != null) {
             userToken = getArguments().getString(USER_TOKEN);
             isSelector = getArguments().getBoolean(IS_SELECTOR);
-            selectedCardForCheckout = getArguments().getSerializable(SELECTED_CARD_FOR_CHECKOUT)==null ? null : (Card) getArguments().getSerializable(SELECTED_CARD_FOR_CHECKOUT);
+            selectedCardForCheckout = getArguments().getSerializable(SELECTED_CARD_FOR_CHECKOUT) == null ? null : (Card) getArguments().getSerializable(SELECTED_CARD_FOR_CHECKOUT);
         }
         home = (Home) getActivity();
         BusProvider.getInstance().register(this);
@@ -121,7 +127,8 @@ public class PaymentFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_payment, container, false);
+        rootView = inflater.inflate(R.layout.fragment_payment, container, false);
+        return rootView;
     }
 
     @Override
@@ -140,30 +147,32 @@ public class PaymentFragment extends BaseFragment {
     }
 
     private void initUI(View view) {
-       // common
-        pbContainer             = (RelativeLayout)       view.findViewById(R.id.progress_bar_container);
-        back                    = (MaterialMenuView)     view.findViewById(R.id.fragment_payment_tab_bar_back_img);
-        title                   = (TextView)             view.findViewById(R.id.fragment_payment_tab_bar_txt);
+        // common
+        pbContainer = (RelativeLayout) view.findViewById(R.id.progress_bar_container);
+        back = (MaterialMenuView) view.findViewById(R.id.fragment_payment_tab_bar_back_img);
+        title = (TextView) view.findViewById(R.id.fragment_payment_tab_bar_txt);
         back.setState(MaterialMenuDrawable.IconState.ARROW);
         // View mode
-        noCardFoundContainer    = (LinearLayout)         view.findViewById(R.id.fragment_payment_blank_container);
-        addCardBtn              = (FloatingActionButton) view.findViewById(R.id.fragment_payment_fab);
-        cardsListView           = (ListView)             view.findViewById(R.id.fragment_payment_list_view);
+        noCardFoundContainer = (LinearLayout) view.findViewById(R.id.fragment_payment_blank_container);
+        addCardBtn = (FloatingActionButton) view.findViewById(R.id.fragment_payment_fab);
+        cardsListView = (ListView) view.findViewById(R.id.fragment_payment_list_view);
         // ADD or EDIT mode
-        addContainer            = (LinearLayout)         view.findViewById(R.id.fragment_payment_form_container);
-        cardNumber              = (EditText)             view.findViewById(R.id.fragment_payment_card_number_txt);
-        name                    = (EditText)             view.findViewById(R.id.fragment_payment_name_txt);
-        month                   = (EditText)             view.findViewById(R.id.fragment_payment_month_txt);
-        year                    = (EditText)             view.findViewById(R.id.fragment_payment_year_txt);
-//        cvv                     = (EditText)             rootView.findViewById(R.id.fragment_payment_cvv_txt);
-        save                    = (ImageButton)          view.findViewById(R.id.fragment_payment_save_btn);
+        addContainer = (LinearLayout) view.findViewById(R.id.fragment_payment_form_container);
+        cardNumber = (EditText) view.findViewById(R.id.fragment_payment_card_number_txt);
+        name = (EditText) view.findViewById(R.id.fragment_payment_name_txt);
+        month = (EditText) view.findViewById(R.id.fragment_payment_month_txt);
+        year = (EditText) view.findViewById(R.id.fragment_payment_year_txt);
+        cvv = (EditText) view.findViewById(R.id.fragment_payment_cvv_txt);
+        save = (ImageButton) view.findViewById(R.id.fragment_payment_save_btn);
     }
 
     private void setValuesBasedOnMode() {
         switch (mode) {
-            case MODE_VIEW: title.setText(home.getResources().getString(R.string.payment_methods));
+            case MODE_VIEW:
+                title.setText(home.getResources().getString(R.string.payment_methods));
                 break;
-            case MODE_ADD: title.setText(home.getResources().getString(R.string.add_payment_method));
+            case MODE_ADD:
+                title.setText(home.getResources().getString(R.string.add_payment_method));
                 cardNumber.setText("");
                 name.setText("");
                 month.setText("");
@@ -214,6 +223,44 @@ public class PaymentFragment extends BaseFragment {
                 if (validateForm()) addCardToStripe();
             }
         });
+
+        cardNumber.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    // change focus to next view
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), month, R.raw.exprire_date_month);
+                }
+            }
+        });
+        name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    // change focus to next view
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), cardNumber, R.raw.card_number);
+                }
+            }
+        });
+        cvv.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    // change focus to next view
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), save, R.raw.save_address);
+                }
+            }
+        });
+
+        month.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    // change focus to next view
+                    UIViewsHandler.handlePageViewFocusChanges(getActivity(), cvv, R.raw.card_cvv);
+                }
+            }
+        });
     }
 
     private void loadCards() {
@@ -236,7 +283,7 @@ public class PaymentFragment extends BaseFragment {
                         cardsListView.setVisibility(View.GONE);
                         noCardFoundContainer.setVisibility(View.VISIBLE);
                     } else {
-                        if (isSelector && selectedCardForCheckout!=null) {
+                        if (isSelector && selectedCardForCheckout != null) {
                             for (Card card :
                                     cards) {
                                 if (card.getId().equals(selectedCardForCheckout.getId()))
@@ -267,23 +314,24 @@ public class PaymentFragment extends BaseFragment {
             }
         });
     }
+
     private boolean validateForm() {
-        if(Strings.isEmpty(name.getText().toString())) {
+        if (Strings.isEmpty(name.getText().toString())) {
             name.setError("Name can't be blank");
             return false;
         }
 
-        if(Strings.isEmpty(cardNumber.getText().toString())) {
+        if (Strings.isEmpty(cardNumber.getText().toString())) {
             cardNumber.setError("Number can't be blank");
             return false;
         }
 
-        if(Strings.isEmpty(month.getText().toString())) {
+        if (Strings.isEmpty(month.getText().toString())) {
             month.setError("Month not valid");
             return false;
         }
 
-        if(Strings.isEmpty(year.getText().toString())) {
+        if (Strings.isEmpty(year.getText().toString())) {
             year.setError("Year not valid");
             return false;
         }
@@ -315,7 +363,7 @@ public class PaymentFragment extends BaseFragment {
 
     private void hideLoader() {
         pbContainer.setVisibility(View.GONE);
-        if (mode==MODE_VIEW) addCardBtn.setVisibility(View.VISIBLE);
+        if (mode == MODE_VIEW) addCardBtn.setVisibility(View.VISIBLE);
     }
 
     private void showAddModeContent() {
@@ -437,5 +485,20 @@ public class PaymentFragment extends BaseFragment {
                 }
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Layout has happened here.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (rootView != null && name.getVisibility() == View.VISIBLE)
+                    UIViewsHandler.handlePaymentPageViews(getActivity(), rootView);
+            }
+        }, 500);
+
     }
 }

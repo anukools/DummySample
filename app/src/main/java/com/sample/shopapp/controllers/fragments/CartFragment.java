@@ -13,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.sample.shopapp.Jiny.BusEvents;
+import com.sample.shopapp.Jiny.PointerService;
 import com.squareup.otto.Subscribe;
 import com.sample.shopapp.R;
 import com.sample.shopapp.api.ApiClient;
@@ -39,6 +41,7 @@ import com.sample.shopapp.viewhelpers.LineItemsCustomAdapter;
 import com.sample.shopapp.viewhelpers.PaymentCardViewHelper;
 
 import java.io.IOException;
+import java.security.cert.PolicyNode;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -213,6 +216,8 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
                     return;
                 }
                 moveToPaymentState();
+
+                PointerService.bus.post(new BusEvents.ShowPaymentEvent());
             }
         });
         // payment rootView
@@ -856,5 +861,17 @@ public class CartFragment extends BaseFragment implements CartLineItemActionsInt
                 else showNoItemsView(false);
             }
         }.execute();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        PointerService.bus.post(new BusEvents.HideEvent());
+        PointerService.bus.post(new BusEvents.HidePaymentEvent());
     }
 }
