@@ -1,8 +1,12 @@
 package com.sample.shopapp.controllers;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +16,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 
+import com.sample.shopapp.Jiny.PointerService;
 import com.squareup.okhttp.ResponseBody;
 import com.sample.shopapp.R;
 import com.sample.shopapp.api.ApiClient;
@@ -39,6 +44,9 @@ public class SplashActivity extends AppCompatActivity {
 
     private Config config;
 
+    Intent uiServiceIntent;
+    public final static int REQUEST_CODE = 10101;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // To make activity full screen
@@ -50,6 +58,8 @@ public class SplashActivity extends AppCompatActivity {
         progressBar = (ProgressBar)       findViewById(R.id.activity_splash_pb);
 
         loadAndParseConfig();
+
+        checkDrawOverlayPermission();
     }
 
     private void loadAndParseConfig() {
@@ -222,5 +232,54 @@ public class SplashActivity extends AppCompatActivity {
                 });
         snackbar.setActionTextColor(Color.RED);
         snackbar.show();
+    }
+
+
+    	/*  JINY TEMP CODE */
+
+    /**
+     * Checks for draw over the apps permisson
+     *
+     * @return
+     */
+    public boolean checkDrawOverlayPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            startUIService();
+            return true;
+        } else {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, REQUEST_CODE);
+                return false;
+            } else {
+                startUIService();
+                return true;
+            }
+        }
+    }
+
+
+    /**
+     * if permission is granted then start UI service
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    @TargetApi(Build.VERSION_CODES.M)
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            if (Settings.canDrawOverlays(this)) {
+                startUIService();
+            }
+        }
+    }
+
+    private void startUIService() {
+        // Start the Ui Service
+        uiServiceIntent = new Intent(this, PointerService.class);
+        startService(uiServiceIntent);
     }
 }

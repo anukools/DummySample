@@ -78,7 +78,8 @@ public class PointerService extends Service {
     @Subscribe
     public void showPointerUIEvent(final BusEvents.ShowUIEvent event) {
         pointerIcon.show(event.getX(), event.getY(), event.getGravity());
-        jinyIcon.show();
+        if(event.isShowJinyIcon())
+            jinyIcon.show();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {

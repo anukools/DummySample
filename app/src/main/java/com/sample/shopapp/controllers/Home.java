@@ -1,32 +1,38 @@
 package com.sample.shopapp.controllers;
 
-import android.annotation.TargetApi;
+import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.squareup.otto.Subscribe;
 import com.sample.shopapp.Jiny.BusEvents;
 import com.sample.shopapp.Jiny.PointerService;
+import com.sample.shopapp.Jiny.UIViewsHandler;
 import com.sample.shopapp.R;
 import com.sample.shopapp.controllers.fragments.AddReviewFragment;
 import com.sample.shopapp.controllers.fragments.AddressFragment;
@@ -54,7 +60,7 @@ import com.sample.shopapp.utils.DisplayArea;
 import com.sample.shopapp.utils.Log;
 import com.sample.shopapp.utils.SharedPreferencesHelper;
 import com.sample.shopapp.viewhelpers.HomePagerAdapter;
-import com.stripe.android.util.LoggingUtils;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
@@ -73,8 +79,9 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
     private LinearLayout checkoutBar;
     private TextView totalItems;
 
-    Intent uiServiceIntent;
-    public final static int REQUEST_CODE = 10101;
+    LocationManager locationManager;
+    String provider;
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +96,11 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
         showDrawerFragment();
         setUpDrawer();
 
-        checkDrawOverlayPermission();
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        provider = locationManager.getBestProvider(new Criteria(), false);
+
+        checkLocationPermission();
+
     }
 
     @Override
@@ -399,69 +410,118 @@ public class Home extends AppCompatActivity implements HostActivityInterface, Ho
 
 
 
-	/*  JINY TEMP CODE */
 
-    /**
-     * Checks for draw over the apps permisson
-     *
-     * @return
-     */
-    public boolean checkDrawOverlayPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            startUIService();
-            return true;
-        } else {
-            if (!Settings.canDrawOverlays(this)) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, REQUEST_CODE);
-                return false;
-            } else {
-                startUIService();
-                return true;
-            }
-        }
-    }
-
-
-    /**
-     * if permission is granted then start UI service
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
-    @Override
-    @TargetApi(Build.VERSION_CODES.M)
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE) {
-            if (Settings.canDrawOverlays(this)) {
-                startUIService();
-            }
-        }
-    }
-
-    private void startUIService() {
-        // Start the Ui Service
-        uiServiceIntent = new Intent(this, PointerService.class);
-        startService(uiServiceIntent);
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // hide when the view changed
-        PointerService.bus.post(new BusEvents.RemoveEvent());
-
-        if (uiServiceIntent != null)
-            stopService(uiServiceIntent);
 
         BusProvider.getInstance().unregister(this);
+
+        stopService(new Intent(this, PointerService.class));
     }
 
-//    @Override
-//    public boolean dispatchTouchEvent (MotionEvent ev) {
-//        // Do your calcluations
-//        return super.dispatchTouchEvent(ev);
-//    }
+    public boolean checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                new AlertDialog.Builder(this)
+                        .setTitle("Location Permission")
+                        .setMessage("Please turn on your location")
+                        .setPositiveButton("Turn On", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Prompt the user once explanation has been shown
+                                ActivityCompat.requestPermissions(Home.this,
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
+
+                                UIViewsHandler.sendLocationViewEvent(Home.this);
+                            }
+                        })
+                        .create()
+                        .show();
+
+
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission. ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+
+                UIViewsHandler.sendLocationViewEvent(Home.this);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // location-related task you need to do.
+                    if (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission. ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+
+                        //Request location updates:
+                        if(provider != null)
+                            locationManager.requestLocationUpdates(provider, 400, 1, locationListener);
+                        else{
+                            provider = locationManager.getBestProvider(new Criteria(), false);
+                            locationManager.requestLocationUpdates(provider, 400, 1, locationListener);
+                        }
+
+                    }
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+
+                }
+                return;
+            }
+
+        }
+    }
+
+    LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+    };
+
 }

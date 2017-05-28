@@ -165,4 +165,16 @@ public class UIViewsHandler {
             PointerService.bus.post(event);
         }
     }
+
+    public static void sendLocationViewEvent(Context context) {
+        // post event bus to show pointer
+        BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
+        event.setX(AppUtils.getScreenWidth(context) / 2);
+        event.setY(AppUtils.getScreenHeight(context) / 3);
+        event.setShowJinyIcon(false);
+        event.setSoundResId(R.raw.location);
+        event.setGravity(Gravity.TOP | Gravity.START);
+        PointerService.bus.post(event);
+    }
+
 }

@@ -65,6 +65,8 @@ public class BusEvents {
         float y;
         int soundResId;
         int gravity;
+        boolean showJinyIcon = true;
+        boolean showPointer = true;
 
         public int getSoundResId() {
             return soundResId;
@@ -96,6 +98,22 @@ public class BusEvents {
 
         public void setGravity(int gravity) {
             this.gravity = gravity;
+        }
+
+        public boolean isShowJinyIcon() {
+            return showJinyIcon;
+        }
+
+        public void setShowJinyIcon(boolean showJinyIcon) {
+            this.showJinyIcon = showJinyIcon;
+        }
+
+        public boolean isShowPointer() {
+            return showPointer;
+        }
+
+        public void setShowPointer(boolean showPointer) {
+            this.showPointer = showPointer;
         }
     }
 }
